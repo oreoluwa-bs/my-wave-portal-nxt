@@ -1,12 +1,9 @@
-import Head from 'next/head'
+import Head from "next/head";
 import { ethers } from "ethers";
 
 export default function Home() {
+  const wave = () => {};
 
-  const wave = () => {
-    
-  }
- 
   return (
     <div>
       <Head>
@@ -16,22 +13,19 @@ export default function Home() {
       </Head>
 
       <main className="mainContainer">
-       
+        <div className="hero">
+          <h1 className="hero__title">👋 Hey there!</h1>
 
-      <div className="dataContainer">
-        <div className="header">
-        👋 Hey there!
+          <p className="hero__subtitle">
+            I am Ore and I am a software developer? Connect your Ethereum wallet
+            and wave at me!
+          </p>
+
+          <button className="btn primary-btn" onClick={wave}>
+            👋 Wave at Me
+          </button>
         </div>
-
-        <div className="bio">
-        I am farza and I worked on self-driving cars so that's pretty cool right? Connect your Ethereum wallet and wave at me!
-        </div>
-
-        <button className="waveButton" onClick={wave}>
-          Wave at Me
-        </button>
-      </div>
       </main>
     </div>
-  )
+  );
 }
