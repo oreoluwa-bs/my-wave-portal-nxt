@@ -1,3 +1,5 @@
+@import url("https://css.gg/spinner-two.css");
+
 html,
 body {
   padding: 0;
@@ -29,6 +31,7 @@ body {
 }
 
 .hero {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -61,4 +64,59 @@ body {
   /* background-color: lightseagreen; */
   background-color: #e94560;
   color: white;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.wave__count {
+  font-size: 2rem;
+  font-weight: bold;
+  position: absolute;
+  right: 0;
+  top: 25%;
+  transform: translateY(-50%);
+
+  background-color: #e945609d;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0.75rem;
+}
+.wave__count::before {
+  content: "wave(s)";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(-30%, -30%);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+.wave__count::after {
+  content: "👋";
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(+30%, -50%);
+}
+
+.sp {
+  display: inline-block;
+  margin-right: 0.5rem;
+  vertical-align: bottom;
 }

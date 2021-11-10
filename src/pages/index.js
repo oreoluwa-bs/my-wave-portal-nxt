@@ -1,8 +1,129 @@
 import Head from "next/head";
 import { ethers } from "ethers";
+import { useEffect, useState } from "react";
+
+import ABI from "@utils/WavePortal.json";
+
+const contractAddress = "0xF2D48C77FbAABE1fFE3C6C476F0a1f4898aa70E1";
+const contractABI = ABI.abi;
 
 export default function Home() {
-  const wave = () => {};
+  // Store user's public wallet
+  const [currentAccount, setCurrentAccount] = useState(null);
+  const [isMining, setIsMining] = useState(false);
+  const [waveCount, setWaveCount] = useState(0);
+
+  const checkIfWalletIsConnected = async () => {
+    try {
+      const { ethereum } = window;
+
+      // Check if  we have etherium
+      if (!ethereum) {
+        console.log("Make sure you have metamask!");
+        return;
+      } else {
+        console.log("We have the ethereum object", ethereum);
+      }
+
+      // Check if we are authorized to access the users wallet
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+
+      if (accounts.length !== 0) {
+        const account = accounts[0];
+        console.log("Found an authorized account:", account);
+        setCurrentAccount(account);
+      } else {
+        console.log("No authorized account found");
+      }
+    } catch {
+      console.log(error);
+    }
+  };
+
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        alert("Get MetaMask!");
+        return;
+      }
+
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      console.log("Connected", accounts[0]);
+      setCurrentAccount(accounts[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const wave = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        // Reads from the Blockchain  - Are free
+        getWaveCount();
+
+        // Writes to the blockchain
+        const waveTxn = await wavePortalContract.wave();
+        setIsMining(true);
+        console.log("Mining...", waveTxn.hash);
+
+        await waveTxn.wait();
+        setIsMining(false);
+        console.log("Mined -- ", waveTxn.hash);
+
+        getWaveCount();
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getWaveCount = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        // Reads from the Blockchain  - Are free
+        let count = await wavePortalContract.getTotalWaves();
+        console.log("Retrieve total wave count...", count.toNumber());
+        setWaveCount(count.toNumber());
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkIfWalletIsConnected();
+  }, [currentAccount]);
+
+  useEffect(() => {
+    getWaveCount();
+  }, []);
 
   return (
     <div>
@@ -15,15 +136,31 @@ export default function Home() {
       <main className="mainContainer">
         <div className="hero">
           <h1 className="hero__title">👋 Hey there!</h1>
+          <span className="wave__count">{waveCount}</span>
 
           <p className="hero__subtitle">
             I am Ore and I am a software developer? Connect your Ethereum wallet
             and wave at me!
           </p>
 
-          <button className="btn primary-btn" onClick={wave}>
-            👋 Wave at Me
-          </button>
+          {!currentAccount ? (
+            <button className="btn" onClick={connectWallet}>
+              Connect to Wallet
+            </button>
+          ) : (
+            <button
+              className="btn primary-btn"
+              onClick={wave}
+              disabled={isMining}
+            >
+              {isMining ? (
+                <i className="gg-spinner-two sp" />
+              ) : (
+                <i className="sp">👋</i>
+              )}
+              Wave at Me
+            </button>
+          )}
         </div>
       </main>
     </div>
